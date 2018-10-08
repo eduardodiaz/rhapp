@@ -21,4 +21,4 @@ import { BreadcrumbsComponent } from './breadcrumbs/breadcrumbs.component';
     ]
 })
 
-export  class SharedModule {}
+export class SharedModule { }
