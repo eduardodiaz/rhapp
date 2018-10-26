@@ -1,14 +1,14 @@
 import { Injectable } from '@angular/core';
-import { Usuario } from '../../models/usuario.model';
+// import { Usuario } from '../../models/usuario.model';
 import { HttpClient } from '@angular/common/http';
 import { URL_SERVICIOS } from '../../config/config';
 import 'rxjs/add/operator/map';
 import { Router } from '@angular/router';
+import { SubirArchivoService } from '../subir-archivo/subir-archivo.service';
+import { Usuario } from 'src/app/models/usuario.model';
 
+@Injectable()
 
-@Injectable({
-  providedIn: 'root'
-})
 export class UsuarioService {
 
   usuario: Usuario;
@@ -16,7 +16,8 @@ export class UsuarioService {
 
   constructor(
     public http: HttpClient,
-    public router: Router
+    public router: Router,
+    public _subirArchivoService: SubirArchivoService
   ) {
 
     this.cargarStorage();
@@ -44,12 +45,20 @@ export class UsuarioService {
       this.token = '';
       this.usuario = null;
     }
+  }
 
+  guardarStorage(id: string, token: string, usuario: Usuario) {
+    localStorage.setItem('id', id);
+    localStorage.setItem('token', token);
+    localStorage.setItem('usuario', JSON.stringify(usuario));
+
+    this.usuario = usuario;
+    this.token = token;
   }
 
   crearUsuario(usuario: Usuario) {
 
-    const url = URL_SERVICIOS + '/usuario';
+    const url = URL_SERVICIOS + '/usuarios';
 
     return this.http.post(url, usuario)
       .map((resp: any) => {
@@ -58,7 +67,42 @@ export class UsuarioService {
 
         return resp.usuario;
       });
+  }
 
+  actualizarUsuario(usuario: Usuario) {
+
+    let url = URL_SERVICIOS + '/usuario/' + usuario._id;
+    url += '?token=' + this.token;
+
+    // console.log(url);
+    return this.http.put(url, usuario)
+      .map( (resp: any) => {
+
+        // this.usuario = resp.usuario;
+        const usuarioDB: Usuario = resp.usuario;
+
+        this.guardarStorage(usuarioDB._id, this.token, usuarioDB);
+        swal('Usuario Actualizado', usuario.nombre, 'success');
+
+        return true;
+
+      });
+  }
+
+  cambiarImagen(archivo: File, id: string) {
+
+    this._subirArchivoService.subirArchivo(archivo, 'usuarios', id)
+      .then( (resp: any) => {
+        this.usuario.img = resp.usuario.img;
+
+        swal('Imagen Actualizada', this.usuario.nombre, 'success');
+
+        this.guardarStorage(id, this.token, this.usuario);
+      })
+      .catch(resp => {
+        console.log(resp);
+
+      });
   }
 
   login(usuario: Usuario, recordar: boolean = false) {
