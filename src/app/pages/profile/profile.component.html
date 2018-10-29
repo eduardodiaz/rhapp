@@ -54,7 +54,7 @@
                 <img *ngIf="imagenTemp" [src]="imagenTemp" class="w150">
 
                 <br> <br>
-                <input (change)="seleccionImagen($event.target.files[0])" type="file" name="" id="">
+                <input (change)="seleccionImagen($event.target.files[0])" type="file">
                 <br><br>
                 <!-- disabled="!imagenSubir" -->
                 <button (click)="cambiarImagen()" [disabled]="!imagenSubir" type="button" class="btn btn-block btn-success waves-effect waves-light m-r-10">

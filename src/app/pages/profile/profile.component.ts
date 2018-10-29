@@ -1,7 +1,6 @@
 import { Component, OnInit } from '@angular/core';
 import { Usuario } from '../../models/usuario.model';
 import { UsuarioService } from 'src/app/services/service.index';
-import { read } from 'fs';
 
 @Component({
   selector: 'app-profile',
@@ -52,13 +51,12 @@ export class ProfileComponent implements OnInit {
     this.imagenSubir = archivo;
 
     const reader = new FileReader();
-    let urlImagenTemp = reader.readAsDataURL(archivo);
+    const urlImagenTemp = reader.readAsDataURL(archivo);
 
     reader.onloadend = () => this.imagenTemp = reader.result;
   }
 
   cambiarImagen() {
     this._usuarioService.cambiarImagen(this.imagenSubir, this.usuario._id);
-
   }
 }
